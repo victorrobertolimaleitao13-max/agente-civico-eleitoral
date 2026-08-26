@@ -1,5 +1,10 @@
 {
+  "name": {
   "name": "agente-civico-eleitoral",
+  "type": "module",
+  "version": "1.0.0",
+  ...
+}
   "version": "1.0.0",
   "description": "Agente de IA para campanha de Joe Valle e Profª Fátima",
   "main": "server.ts",
