@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: agente-civico-eleitoral
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://agente-civico-eleitoral.onrender.com
+    autoDeploy: true
