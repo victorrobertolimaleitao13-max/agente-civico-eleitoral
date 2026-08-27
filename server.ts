@@ -25,19 +25,30 @@ const cache = new Map();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+
+// Rota de saúde para diagnóstico
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Rota principal do chat com logs detalhados
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
-    if (!message) return res.status(400).json({ error: 'Mensagem vazia' });
+    console.log('🔹 Mensagem recebida:', message);
+
+    if (!message) {
+      console.warn('⚠️ Mensagem vazia');
+      return res.status(400).json({ error: 'Mensagem vazia' });
+    }
 
     const cacheKey = message.toLowerCase().trim();
     if (cache.has(cacheKey)) {
+      console.log('✅ Resposta do cache');
       return res.json({ reply: cache.get(cacheKey) });
     }
 
+    console.log('📡 Chamando Gemini com a chave:', process.env.GEMINI_API_KEY ? 'Chave presente' : 'Chave AUSENTE!');
     const prompt = `
       Você é o Agente de IA Cívico-Eleitoral da campanha de Joe Valle (Deputado Distrital - 12345) e Professora Fátima Sousa (Deputada Federal - 1230).
       Responda de forma clara, objetiva e com base nos dados oficiais.
@@ -51,14 +62,18 @@ app.post('/api/chat', async (req, res) => {
 
     const result = await model.generateContent(prompt);
     const reply = result.response.text();
+    console.log('✅ Resposta gerada com sucesso');
 
     cache.set(cacheKey, reply);
     setTimeout(() => cache.delete(cacheKey), 3600000);
 
     res.json({ reply });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro interno no servidor' });
+    console.error('❌ ERRO DETALHADO:', error);
+    if (error.response) {
+      console.error('📄 Resposta da API:', error.response.data);
+    }
+    res.status(500).json({ error: error.message || 'Erro interno no servidor' });
   }
 });
 
