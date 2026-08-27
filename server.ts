@@ -25,7 +25,9 @@ const cache = new Map();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
