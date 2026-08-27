@@ -8,6 +8,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Confia no proxy (Render usa proxy reverso)
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(compression());
 app.use(cors({
@@ -17,21 +20,21 @@ app.use(express.json({ limit: '10mb' }));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100
+  max: 100,
+  validate: { trustProxy: false }
 });
 app.use('/api/chat', limiter);
 
 const cache = new Map();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+// MODELO CORRETO: gemini-1.5-pro (ou gemini-1.5-flash)
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
-// Rota de saúde para diagnóstico
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Rota principal do chat com logs detalhados
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
