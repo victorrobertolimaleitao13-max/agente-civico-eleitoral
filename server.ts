@@ -28,7 +28,7 @@ app.use('/api/chat', limiter);
 const cache = new Map();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-// MODELO CORRETO: gemini-1.5-pro (ou gemini-1.5-flash)
+// MODELO CORRETO: gemini-1.5-pro
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
 app.get('/health', (req, res) => {
